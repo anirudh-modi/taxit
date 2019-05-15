@@ -1,0 +1,12 @@
+{
+    "env": {
+        "PORT": {
+            "value": 4000
+        }
+    },
+    "formation": {
+        "web": {
+            "quantity": 1
+        }
+    }
+}
