@@ -1,0 +1,17 @@
+td {
+    background: #00000017;
+    padding: 5px 10px;
+    text-align: center;
+}
+
+tr.waiting {
+    background: #ffc1074a;
+}
+
+tr.completed {
+    background: #00968861;
+}
+
+tr.ongoing {
+    background: #2196f345;
+}
