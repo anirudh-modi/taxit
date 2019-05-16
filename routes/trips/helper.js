@@ -11,7 +11,10 @@ function stopTrip(timeOfCompletion) {
                 WHERE status='ONGOING' AND picked_at <= (now() - INTERVAL '5 min') RETURNING *;`)
         .then(function (trip) {
             console.log(trip[0]);
-        });
+        })
+        .catch(function (err) {
+            console.log('Error while marking trips as COMPLETED', err)
+        })
 }
 
 module.exports = {
