@@ -4,7 +4,7 @@
   "description": "Driver-Customer taxi system",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode=development",
+    "build": "webpack",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
