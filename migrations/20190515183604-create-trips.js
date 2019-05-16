@@ -22,12 +22,11 @@ module.exports = {
 					allowNull: false
 				},
 				driver_id: {
-					type: Sequelize.INTEGER,
-					allowNull: false
-					// allowNull defaults to true
+					type: Sequelize.INTEGER
 				},
 				status: {
-					type: Sequelize.ENUM('WAITING', 'ONGOING', 'COMPLETED')
+					type: Sequelize.ENUM('WAITING', 'ONGOING', 'COMPLETED'),
+					defaultValue: 'WAITING'
 				},
 				created_at: {
 					type: Sequelize.DATE,
