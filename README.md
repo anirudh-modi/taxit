@@ -2,10 +2,10 @@
 Driver-Customer taxi system
 
 ## Urls
-Dashboard - https://taxit.herokuapp.com/
-Driver - https://taxit.herokuapp.com/driver.html?id=1
-Customer - https://taxit.herokuapp.com/customer.html
-Specific Customer - https://taxit.herokuapp.com/customer.html?customerId=1
+- Dashboard - https://taxit.herokuapp.com/
+- Driver - https://taxit.herokuapp.com/driver.html?id=1
+- Customer - https://taxit.herokuapp.com/customer.html
+- Specific Customer - https://taxit.herokuapp.com/customer.html?customerId=1
 
 ## DB
 ### Trips Schema
