@@ -21,12 +21,12 @@ Driver-Customer taxi system
 | updated_at | the time at the record was last modified |
 ## API
 #### `GET /trips/:status(ALL|WAITING|ONGOING|COMPLETED)?customerId=&driverId=`
-Query - Fetches trips corresponding to the customer, or if the driver id is provided then searches for all trips completed/ongoing by the driver and all waiting trips
+Query - Fetches trips corresponding to the customer, or if the driver id is provided then searches for all trips completed/ongoing by the driver and all waiting trips.
 Description - Fetches all trip depending on the status mentioned.
 Returns - Array of trips
 
-#### `POST /trips`
-Query - customerId mandatory to create a trip
+#### `POST /trips?customerId=&socketId=`
+Query - customerId mandatory to create a trip and socketId is to identity the client who is making the request and prevent sending emit to self
 Description -  Creates a new trip for the mentioend customer
 Returns - Trip object
 
@@ -34,12 +34,13 @@ Returns - Trip object
 Description - Fetches trip corresponding to the id mentioned
 Returns - Trip object
 
-#### `GET /trips/:id/start?driverId=`
-Query - driverId a mandatory field to ensure that the trip can be started by the mentioned driver
+#### `GET /trips/:id/start?driverId=&socketId=`
+Query - driverId a mandatory field to ensure that the trip can be started by the mentioned driver, socketId is to identity the client who is making the request and prevent sending emit to self
 Description - Changes the status of the trip from `WAITING` to `ONGOING` and if the driver is not busy
 Returns - Updated Trip object
 
-#### `GET /trips/:id/stop`
+#### `GET /trips/:id/stop?socketId=`
+Query - socketId is to identity the client who is making the request and prevent sending emit to self
 Description - Changes the status of the trip from `ONGOING` to `COMPLETED` and if the trip is not completed
 Returns - Updated Trip object
 
