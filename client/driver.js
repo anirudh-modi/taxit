@@ -1,5 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
+import socketIOClient from "socket.io-client";
+
 import { PendingSince, RequestedOn, PickedOn, CompletedOn } from './components/pending-since';
 import Table from './components/table';
 import api from './api'
@@ -30,7 +32,7 @@ class App extends React.Component {
     }
 
     selectTrip(trip) {
-        api.post(`/trips/${trip}/start?driverId=${this.state.driver_id}`)
+        api.post(`/trips/${trip}/start?driverId=${this.state.driver_id}&socketId=${this.socket.id}`)
             .then(this.getDriverTrips)
             .catch(function (err) {
                 alert(err.message);
@@ -46,6 +48,17 @@ class App extends React.Component {
             this.getDriverTrips();
         })
     }
+
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
+    componentDidMount() {
+        this.socket = socketIOClient('localhost:4000');
+        this.socket.on('Trip status change', this.getDriverTrips);
+        this.socket.on('Trip Added', this.getDriverTrips);
+    }
+
     render() {
         var self = this;
         const waitinDescriptor = [

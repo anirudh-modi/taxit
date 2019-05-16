@@ -3,6 +3,7 @@ const validator = require('validator');
 const db = require('../../models');
 const { getPlain, validationError } = require('../../util/helper');
 const tripIdRouter = require('./id');
+const socketHandler = require('../../util/socketHandler');
 
 router.get('/:tripStatus(ALL|WAITING|ONGOING|COMPLETED)', function (req, res, next) {
     const { tripStatus } = req.params;
@@ -31,7 +32,8 @@ router.get('/:tripStatus(ALL|WAITING|ONGOING|COMPLETED)', function (req, res, ne
     return db
         .Trips
         .findAll({
-            where: whereClause
+            where: whereClause,
+            order: [['created_at', 'DESC'], ['id', 'ASC']]
         })
         .then(
             trips => res.json(trips
@@ -42,7 +44,7 @@ router.get('/:tripStatus(ALL|WAITING|ONGOING|COMPLETED)', function (req, res, ne
 });
 
 router.post('/', function (req, res, next) {
-    const { customerId } = req.query;
+    const { customerId, socketId } = req.query;
 
     if (!customerId) {
         throw validationError('Customer id mandatory for creating a new trip');
@@ -56,8 +58,10 @@ router.post('/', function (req, res, next) {
         .create({
             customer_id: parseInt(customerId)
         })
-        // TODO: Send emit to drivers
-        .then(trip => res.json(getPlain(trip)))
+        .then(trip => {
+            socketHandler.sendEmit('Trip Added', socketId);
+            return res.json(getPlain(trip));
+        })
         .catch(next);
 });
 

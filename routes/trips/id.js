@@ -5,6 +5,7 @@ const db = require('../../models');
 const { getPlain, validationError, notFoundError } = require('../../util/helper');
 const scheduler = require('../../util/scheduler');
 const helper = require('./helper');
+const socketHandler = require('../../util/socketHandler');
 
 router.get('/', function (req, res, next) {
     const { tripId } = req.params;
@@ -27,10 +28,9 @@ router.get('/', function (req, res, next) {
 })
 
 router.post('/start', function (req, res, next) {
-    const { driverId } = req.query;
+    const { driverId, socketId } = req.query;
     const { tripId } = req.params;
 
-    console.log(req.params);
     if (!driverId) {
         throw validationError('Driver id mandatory for starting a trip');
     }
@@ -79,6 +79,7 @@ router.post('/start', function (req, res, next) {
                 var timeStamp = Date.now() + parseInt(process.env.STOP_TIME_IN_MS);
                 scheduler.set(timeStamp, helper.stopTrip);
 
+                socketHandler.sendEmit('Trip status change', socketId)
                 return trip[0];
             }
         })
@@ -112,7 +113,10 @@ router.post('/stop', function (req, res, next) {
             }
         })
         // TODO: Send emit to all driver and customer about end trip
-        .then(updatedTrip => res.json(updatedTrip[0]))
+        .then(updatedTrip => {
+            socketHandler.sendEmit('Trip status change', socketId)
+            return res.json(updatedTrip[0])
+        })
         .catch(next)
 });
 

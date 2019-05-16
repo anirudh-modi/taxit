@@ -1,8 +1,8 @@
 module.exports = {
     entry: {
-        admin: './src/index.js',
-        customer: './src/customer.js',
-        driver: './src/driver.js'
+        admin: './client/index.js',
+        customer: './client/customer.js',
+        driver: './client/driver.js'
     },
     output: {
         path: __dirname + '/public/bundles',

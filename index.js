@@ -6,9 +6,15 @@ var bodyParser = require('body-parser');
 const path = require('path');
 const routes = require('./routes');
 const db = require('./models');
+const socketHandler = require('./util/socketHandler');
 
 const app = express();
 const { PORT } = process.env;
+
+const http = require('http').Server(app);
+
+socketHandler.createSocketIOServer(http);
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -40,7 +46,7 @@ db.sequelize
     .authenticate()
     .then(function () {
         console.log('Connected to db');
-        app.listen(PORT, function () {
+        http.listen(PORT, function () {
             console.log(`Server is up!!!!\nListening on port ${PORT}`);
         });
     })

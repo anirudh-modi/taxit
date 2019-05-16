@@ -1,5 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
+import socketIOClient from "socket.io-client";
+
 import api from './api';
 import Table from './components/table';
 import { PendingSince } from './components/pending-since';
@@ -15,6 +17,7 @@ class App extends React.Component {
             customer_id: null,
             trips: []
         };
+        this.getUsersTrips = this.getUsersTrips.bind(this);
     }
 
     getUsersTrips() {
@@ -39,11 +42,21 @@ class App extends React.Component {
         })
     }
 
+    componentDidMount() {
+        this.socket = socketIOClient('localhost:4000');
+        this.socket.on('Trip status change', this.getUsersTrips);
+        this.socket.on('Trip Added', this.getUsersTrips);
+    }
+
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
     handleSubmit(e) {
         e.preventDefault();
 
         api
-            .post(`/trips?customerId=${this.input.current.value}`)
+            .post(`/trips?customerId=${this.input.current.value}&socketId=${this.socket.id}`)
             .then(function (response) {
                 this.setState({
                     customer_id: this.input.current.value
