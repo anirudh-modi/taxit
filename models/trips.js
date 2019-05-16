@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
             picked_at: {
                 type: DataTypes.DATE
             },
+            completed_at: {
+                type: DataTypes.DATE
+            },
             updated_at: {
                 type: DataTypes.DATE,
                 defaultValue: DataTypes.NOW

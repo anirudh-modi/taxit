@@ -99,31 +99,53 @@ router.post('/:tripId/start', function (req, res, next) {
             }
         })
         .then(function () {
-            return db.Trips
-                .findOne({
-                    where: {
-                        id: parseInt(tripId),
-                        status: 'WAITING',
-                        driver_id: null
-                    }
-                })
+            return db.sequelize
+                .query(
+                    `UPDATE trips 
+                SET driver_id=${parseInt(driverId)}, picked_at='NOW()', status='ONGOING' 
+                WHERE id=${parseInt(tripId)} AND status='WAITING' AND driver_id is NULL RETURNING *;`);
         })
         .then(function (trip) {
-            if (!trip) {
+            if (!trip[0].length) {
                 throw validationError(`Trip already started by another driver`);
             }
             else {
-                return trip
-                    .update({
-                        driver_id: parseInt(driverId),
-                        picked_at: new Date(),
-                        status: 'ONGOING'
-                    })
+                return trip[0];
             }
         })
         // TODO: Start timer
         // TODO: Send emit to all driver and customer
-        .then(updatedTrip => res.json(getPlain(updatedTrip)))
+        .then(updatedTrip => res.json(updatedTrip[0]))
+        .catch(next)
+});
+
+router.post('/:tripId/stop', function (req, res, next) {
+    const { tripId } = req.params;
+
+    if (!tripId) {
+        throw validationError('Trip id mandatory for starting a trip');
+    }
+
+    if (!validator.isInt(tripId)) {
+        throw validationError('Invalid trip id');
+    }
+
+    db.sequelize
+        .query(
+            `UPDATE trips 
+                SET status='COMPLETED', completed_at='NOW()' 
+                WHERE id=${parseInt(tripId)} AND status='ONGOING' RETURNING *;`)
+        .then(function (trip) {
+            if (!trip[0].length) {
+                throw validationError(`Trip has already ended`);
+            }
+            else {
+                return trip[0];
+            }
+        })
+        // TODO: Start timer
+        // TODO: Send emit to all driver and customer
+        .then(updatedTrip => res.json(updatedTrip[0]))
         .catch(next)
 });
 
