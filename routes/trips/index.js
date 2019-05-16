@@ -6,10 +6,15 @@ const tripIdRouter = require('./id');
 
 router.get('/:tripStatus(ALL|WAITING|ONGOING|COMPLETED)', function (req, res, next) {
     const { tripStatus } = req.params;
+    const { customerId } = req.query;
     const whereClause = {}
 
     if (tripStatus !== 'ALL') {
         whereClause.status = tripStatus;
+    }
+
+    if (customerId) {
+        whereClause.customer_id = parseInt(customerId);
     }
 
     return db
