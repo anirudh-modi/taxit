@@ -85,12 +85,28 @@ router.post('/:tripId/start', function (req, res, next) {
     }
 
     db.Trips
-        .findOne({
+        .findAll({
             where: {
-                id: parseInt(tripId),
-                status: 'WAITING',
-                driver_id: null
+                driver_id: parseInt(driverId),
+                status: {
+                    [db.Sequelize.Op.eq]: 'ONGOING'
+                }
             }
+        })
+        .then(function (trips) {
+            if (trips.length) {
+                throw validationError('Driver is busy with an ongoing trip')
+            }
+        })
+        .then(function () {
+            return db.Trips
+                .findOne({
+                    where: {
+                        id: parseInt(tripId),
+                        status: 'WAITING',
+                        driver_id: null
+                    }
+                })
         })
         .then(function (trip) {
             if (!trip) {
