@@ -32,9 +32,8 @@ export default class Table extends React.Component {
         return (
             <table>
                 {getTableHeader(descriptor)}
-                {getTableBody(descriptor, data)}
+                {data && data.length ? getTableBody(descriptor, data) : null}
             </table>
         )
-
     }
 }

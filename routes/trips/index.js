@@ -6,7 +6,7 @@ const tripIdRouter = require('./id');
 
 router.get('/:tripStatus(ALL|WAITING|ONGOING|COMPLETED)', function (req, res, next) {
     const { tripStatus } = req.params;
-    const { customerId } = req.query;
+    const { customerId, driverId } = req.query;
     const whereClause = {}
 
     if (tripStatus !== 'ALL') {
@@ -15,6 +15,17 @@ router.get('/:tripStatus(ALL|WAITING|ONGOING|COMPLETED)', function (req, res, ne
 
     if (customerId) {
         whereClause.customer_id = parseInt(customerId);
+    }
+
+    if (driverId) {
+        whereClause[db.Sequelize.Op.or] = [
+            {
+                driver_id: parseInt(driverId)
+            },
+            {
+                status: "WAITING"
+            }
+        ]
     }
 
     return db

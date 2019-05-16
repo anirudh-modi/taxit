@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import api from './api';
 import Table from './components/table'
-import PendingSince from './components/pending-since'
+import { PendingSince } from './components/pending-since'
 let app = document.getElementById('app');
 
 class App extends React.Component {

@@ -7,9 +7,12 @@ function get(url) {
                 return response.data;
             }
             else {
-                return Promise.reject(response);
+                return Promise.reject(response.data);
             }
-        });
+        })
+        .catch(function (err) {
+            return Promise.reject(err.data);
+        })
 }
 
 function post(url) {
@@ -19,9 +22,12 @@ function post(url) {
                 return response.data;
             }
             else {
-                return Promise.reject(response);
+                return Promise.reject(response.data);
             }
-        });
+        })
+        .catch(function (err) {
+            return Promise.reject(err.response.data);
+        })
 }
 
 export default {

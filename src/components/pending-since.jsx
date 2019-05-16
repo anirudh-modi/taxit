@@ -9,9 +9,21 @@ function getDiff(time1, time2) {
 
 }
 
-export default function PendingSince(trip) {
-    console.log(trip)
+export function PendingSince(trip) {
     return trip.status !== 'COMPLETED'
         ? getDiff(Date.now(), new Date(trip.created_at).getTime())
         : null
+}
+
+
+export function RequestedOn(trip) {
+    return getDiff(Date.now(), new Date(trip.created_at).getTime())
+}
+
+export function PickedOn(trip) {
+    return getDiff(Date.now(), new Date(trip.picked_at).getTime())
+}
+
+export function CompletedOn(trip) {
+    return getDiff(Date.now(), new Date(trip.completed_at).getTime())
 }
