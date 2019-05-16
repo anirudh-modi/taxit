@@ -32,7 +32,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        this.socket = socketIOClient('localhost:4000');
+        this.socket = socketIOClient();
         this.socket.on('Trip status change', this.updateTrip);
         this.socket.on('Trip Added', this.updateTrip);
     }
