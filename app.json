@@ -4,7 +4,7 @@
             "value": 4000
         },
         "STOP_TIME_IN_MS": {
-            "value": 30000
+            "value": 300000
         }
     },
     "formation": {
