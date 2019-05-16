@@ -30,12 +30,17 @@ module.exports = {
 					type: Sequelize.ENUM('WAITING', 'ONGOING', 'COMPLETED')
 				},
 				created_at: {
+					type: Sequelize.DATE,
+					defaultValue: Sequelize.NOW
+				},
+				picked_at: {
 					type: Sequelize.DATE
 				},
 				updated_at: {
-					type: Sequelize.DATE
+					type: Sequelize.DATE,
+					defaultValue: Sequelize.NOW
 				}
-			});
+			})
 	},
 
 	down: (queryInterface, Sequelize) => {
