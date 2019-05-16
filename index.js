@@ -7,13 +7,11 @@ const path = require('path');
 const routes = require('./routes');
 const db = require('./models');
 
-
 const app = express();
 const { PORT } = process.env;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 
 app.get('/', function (req, res) {
     res.redirect('/index.html');

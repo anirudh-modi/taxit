@@ -1,30 +1,12 @@
-const router = require('express').Router();
+const router = require('express').Router({ mergeParams: true });
 const validator = require('validator');
-const db = require('../models');
-const { getPlain, validationError, notFoundError } = require('../helper');
 
-router.get('/:tripStatus(ALL|WAITING|ONGOING|COMPLETED)', function (req, res, next) {
-    const { tripStatus } = req.params;
-    const whereClause = {}
+const db = require('../../models');
+const { getPlain, validationError, notFoundError } = require('../../util/helper');
+const scheduler = require('../../util/scheduler');
+const helper = require('./helper');
 
-    if (tripStatus !== 'ALL') {
-        whereClause.status = tripStatus;
-    }
-
-    return db
-        .Trips
-        .findAll({
-            where: whereClause
-        })
-        .then(
-            trips => res.json(trips
-                .map(trip => getPlain(trip))
-            )
-        )
-        .catch(next);
-})
-
-router.get('/:tripId', function (req, res, next) {
+router.get('/', function (req, res, next) {
     const { tripId } = req.params;
 
     return db.Trips
@@ -44,30 +26,11 @@ router.get('/:tripId', function (req, res, next) {
         .catch(next);
 })
 
-router.post('/', function (req, res, next) {
-    const { customerId } = req.query;
-
-    if (!customerId) {
-        throw validationError('Customer id mandatory for creating a new trip');
-    }
-
-    if (!validator.isInt(customerId)) {
-        throw validationError('Invalid customer id');
-    }
-
-    db.Trips
-        .create({
-            customer_id: parseInt(customerId)
-        })
-        // TODO: Send emit to drivers
-        .then(trip => res.json(getPlain(trip)))
-        .catch(next);
-});
-
-router.post('/:tripId/start', function (req, res, next) {
+router.post('/start', function (req, res, next) {
     const { driverId } = req.query;
     const { tripId } = req.params;
 
+    console.log(req.params);
     if (!driverId) {
         throw validationError('Driver id mandatory for starting a trip');
     }
@@ -84,6 +47,9 @@ router.post('/:tripId/start', function (req, res, next) {
         throw validationError('Invalid trip id');
     }
 
+    /**
+     * Verify that the driver is not busy
+     */
     db.Trips
         .findAll({
             where: {
@@ -102,24 +68,26 @@ router.post('/:tripId/start', function (req, res, next) {
             return db.sequelize
                 .query(
                     `UPDATE trips 
-                SET driver_id=${parseInt(driverId)}, picked_at='NOW()', status='ONGOING' 
-                WHERE id=${parseInt(tripId)} AND status='WAITING' AND driver_id is NULL RETURNING *;`);
+                        SET driver_id=${parseInt(driverId)}, picked_at='NOW()', status='ONGOING' 
+                        WHERE id=${parseInt(tripId)} AND status='WAITING' AND driver_id is NULL RETURNING *;`);
         })
         .then(function (trip) {
             if (!trip[0].length) {
                 throw validationError(`Trip already started by another driver`);
             }
             else {
+                var timeStamp = Date.now() + parseInt(process.env.STOP_TIME_IN_MS);
+                scheduler.set(timeStamp, helper.stopTrip);
+
                 return trip[0];
             }
         })
-        // TODO: Start timer
         // TODO: Send emit to all driver and customer
         .then(updatedTrip => res.json(updatedTrip[0]))
         .catch(next)
 });
 
-router.post('/:tripId/stop', function (req, res, next) {
+router.post('/stop', function (req, res, next) {
     const { tripId } = req.params;
 
     if (!tripId) {
@@ -143,8 +111,7 @@ router.post('/:tripId/stop', function (req, res, next) {
                 return trip[0];
             }
         })
-        // TODO: Start timer
-        // TODO: Send emit to all driver and customer
+        // TODO: Send emit to all driver and customer about end trip
         .then(updatedTrip => res.json(updatedTrip[0]))
         .catch(next)
 });

@@ -2,6 +2,9 @@
     "env": {
         "PORT": {
             "value": 4000
+        },
+        "STOP_TIME_IN_MS": {
+            "value": 30000
         }
     },
     "formation": {
